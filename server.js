@@ -9,7 +9,11 @@ dotenv.config();
 const app = express();
 
 // --- MIDDLEWARES ---
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://your-app.netlify.app",
+  }),
+);
 app.use(express.json());
 
 // --- ROUTES ---
@@ -98,3 +102,5 @@ app.listen(PORT, () => {
   console.log(`🌍 URL: http://localhost:${PORT}`);
   console.log(`====================================\n`);
 });
+
+export default app;
