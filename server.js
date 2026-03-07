@@ -9,11 +9,7 @@ dotenv.config();
 const app = express();
 
 // --- MIDDLEWARES ---
-app.use(
-  cors({
-    origin: "https://your-app.netlify.app",
-  }),
-);
+app.use(cors());
 app.use(express.json());
 
 // --- ROUTES ---
