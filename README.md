@@ -6,6 +6,8 @@ Noor Al-Iman (Light of Faith) is a comprehensive spiritual platform designed to 
 
 **API Base URL:** `https://noor-ai-iman.vercel.app`
 
+**Document:** https://docs.google.com/document/d/1y3xA3uyVb4FoQKlhcGFNs0Fn9IKELIjFlfY8QyOj9gw/edit?usp=sharing
+
 ---
 
 ##  About the App
