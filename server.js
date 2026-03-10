@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { redisClient } from "./config/redis.js"; // Aapka custom redis client
+import { redisClient, connectRedis } from "./config/redis.js";
 import authRoutes from "./routes/authRoutes.js";
 
 dotenv.config();
@@ -12,10 +12,23 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// 🚀 VERCEL SPECIFIC MIDDLEWARE: Har request se pehle Redis connect karein
+app.use(async (req, res, next) => {
+  try {
+    await connectRedis();
+    next();
+  } catch (err) {
+    console.error("Redis Middleware Error:", err.message);
+    res
+      .status(500)
+      .json({ error: "Database Connection Failed", details: err.message });
+  }
+});
+
 // --- ROUTES ---
 app.use("/api/auth", authRoutes);
 
-// 1. Get All Naats (Fix: Use redisClient instead of client)
+// 1. Get All Naats
 app.get("/api/naats", async (req, res) => {
   try {
     const naats = await redisClient.get("naats_list");
@@ -23,7 +36,7 @@ app.get("/api/naats", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Redis Fetch Error" });
   }
-}); // <-- Yahan closing bracket missing tha
+});
 
 // 2. Toggle Favorite
 app.post("/api/favorites/toggle", async (req, res) => {
@@ -81,6 +94,7 @@ app.post("/api/todo/save", async (req, res) => {
   }
 });
 
+// Root Route
 app.get("/", (req, res) => {
   res.send("🚀 Noor Al-Iman API is Live and Running!");
 });
@@ -91,12 +105,16 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Something went wrong on the server!" });
 });
 
+// PORT Logic for Local & Vercel
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`\n====================================`);
-  console.log(`🔥 Server started on port ${PORT}`);
-  console.log(`🌍 URL: http://localhost:${PORT}`);
-  console.log(`====================================\n`);
-});
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`\n====================================`);
+    console.log(`🔥 Server started on port ${PORT}`);
+    console.log(`🌍 URL: http://localhost:${PORT}`);
+    console.log(`====================================\n`);
+  });
+}
 
+// Vercel Entry Point Export
 export default app;
